@@ -1,6 +1,5 @@
 # mod_vlimit 
-Control the number of references from the same IP address to file access
-     or the number of references from the same file name to file access
+Control the number of references from the same IP address to file access or the number of references from the same file name to file access
 
 By matsumoto_r (MATSUMOTO Ryosuke) Sep 2010 in Japan
 
@@ -29,13 +28,14 @@ LoadModule vlimit_module modules/mod_vlimit.so
 ```
 
 ### How To Use
+- VlimitIP usage
 
-- VlimitIP <number of MaxConnectionsPerHost to DocumentRoot> (RealPath of DocumentRoot)
+VlimitIP `number of MaxConnectionsPerHost to DocumentRoot` `(RealPath of DocumentRoot)`
+
 ```
 <Directory "/www/hoge/huga/001">
      VlimitIP 5
 </Directory>
-
 
 <Files "a.txt">
     VlimitIP 10 /www/hoge/huga/001/a.txt
@@ -46,8 +46,9 @@ LoadModule vlimit_module modules/mod_vlimit.so
 </Files>
 ```
 
+- VlimitFile usage
 
-- VlimitFile <number of MaxConnectionsPerFile> (RealPath of DocumentRoot)
+VlimitFile `number of MaxConnectionsPerFile` `(RealPath of DocumentRoot)`
 
 ```
 <Files "a.txt">
@@ -60,42 +61,49 @@ LoadModule vlimit_module modules/mod_vlimit.so
 ```
 
 - Check Debug Log
+
 ```
 touch /tmp/VLIMIT_DEBUG
 less /var/log/syslog
 ```
 
 - Check Module Access Log
+
 ```
 touch /tmp/VLIMIT_LOG
 less /tmp/mod_vlimit.log
 ```
 
 - Check Current File Counter Lists
+
 ```
 touch /tmp/VLIMIT_FILE_STAT
 cat /tmp/vlimit_file_stat.list
 ```
      
 - recreate lists
+
 ```
 rm /tmp/vlimit_file_stat.list  
 cat /tmp/vlimit_file_stat.list
 ```
 
 - Check Current IP Counter Lists
+
 ```
 touch /tmp/VLIMIT_IP_STAT
 cat /tmp/vlimit_ip_stat.list
 ```
      
 - recreate lists
+
 ```
 rm /tmp/vlimit_ip_stat.list  
 cat /tmp/vlimit_ip_stat.list
 ```
 
 - mod_vlimit.log sample
+
 ```
 [Fri Mar 11 11:54:48 2011] pid=[28734] name=[172.16.71.46] client=[172.16.71.46] RESULT:  OK INC ip_count: 1/5 file_count: 0/0 file=[/var/www/html/32.php]
 [Fri Mar 11 11:54:48 2011] pid=[28734] name=[172.16.71.46] client=[172.16.71.46] RESULT: END DEC ip_count: 0/5 file_count: 0/0 file=[/var/www/html/32.php]
@@ -114,6 +122,7 @@ cat /tmp/vlimit_ip_stat.list
 ```
 
 - vlimit_file_stat.list sample
+
 ```
 [Fri Mar 11 11:51:15 2011] slot=[2] filename=[20.php] counter=[10]
 [Fri Mar 11 11:51:15 2011] slot=[3] filename=[12.php] counter=[7]
@@ -128,6 +137,7 @@ cat /tmp/vlimit_ip_stat.list
 ```
 
 - vlimit_ip_stat.list sample
+
 ```
 [Fri Mar 11 11:54:29 2011] slot=[0] ipaddress=[172.16.71.46] counter=[6]
 [Fri Mar 11 11:54:29 2011] slot=[0] ipaddress=[172.16.71.47] counter=[5]
