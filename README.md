@@ -28,9 +28,7 @@ LoadModule vlimit_module modules/mod_vlimit.so
 ```
 
 ### How To Use
-- VlimitIP usage
-
-VlimitIP `number of MaxConnectionsPerHost to DocumentRoot` `(RealPath of DocumentRoot)`
+* VlimitIP `number of MaxConnectionsPerHost to DocumentRoot` `(RealPath of DocumentRoot)`
 
 ```
 <Directory "/www/hoge/huga/001">
@@ -46,9 +44,7 @@ VlimitIP `number of MaxConnectionsPerHost to DocumentRoot` `(RealPath of Documen
 </Files>
 ```
 
-- VlimitFile usage
-
-VlimitFile `number of MaxConnectionsPerFile` `(RealPath of DocumentRoot)`
+- VlimitFile `number of MaxConnectionsPerFile` `(RealPath of DocumentRoot)`
 
 ```
 <Files "a.txt">
