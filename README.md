@@ -1,6 +1,8 @@
 # mod_vlimit 
 Control the number of references from the same IP address to file access or the number of references from the same file name to file access By matsumoto_r (MATSUMOTO Ryosuke) Sep 2010 in Japan
 
+See also http://blog.matsumoto-r.jp/?p=1479
+
 - Date     2010/09/21
 - Version  1.00
 
