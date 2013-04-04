@@ -1,7 +1,5 @@
 # mod_vlimit 
-Control the number of references from the same IP address to file access or the number of references from the same file name to file access
-
-By matsumoto_r (MATSUMOTO Ryosuke) Sep 2010 in Japan
+Control the number of references from the same IP address to file access or the number of references from the same file name to file access By matsumoto_r (MATSUMOTO Ryosuke) Sep 2010 in Japan
 
 - Date     2010/09/21
 - Version  1.00
@@ -15,8 +13,8 @@ By matsumoto_r (MATSUMOTO Ryosuke) Sep 2010 in Japan
  2010/09/22 0.90 vlimit_mutex add matsumoto_r
  2010/12/24 1.00 ServerAlias routine add matsumoto_r
 ```
+
 ## How To Compile
-### Use DSO
 - Build
 ```
 apxs -i -c mod_vlimit.c
@@ -27,7 +25,7 @@ apxs -i -c mod_vlimit.c
 LoadModule vlimit_module modules/mod_vlimit.so
 ```
 
-### How To Use
+## How To Use
 * VlimitIP `number of MaxConnectionsPerHost to DocumentRoot` `(RealPath of DocumentRoot)`
 
 ```
