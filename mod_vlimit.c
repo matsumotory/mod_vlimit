@@ -591,12 +591,16 @@ static int check_virtualhost_name(request_rec *r) {
     int i;
     const char *header_name;
     const char *alias_name;
+    char *access_host;
 
     header_name = apr_table_get(r->headers_in, "HOST");
+    access_host = strtok((char *)header_name, ":");
+    if (access_host == NULL)
+        access_host = (char *)header_name;
 
-    if (strcmp(header_name, r->server->server_hostname) == 0) {
+    if (strcmp(access_host, r->server->server_hostname) == 0) {
         vlimit_debug_log_buf = apr_psprintf(r->pool, "Match: access_name=(%s) ServerName=(%s)"
-            , header_name
+            , access_host
             , r->server->server_hostname
         );
         VLIMIT_DEBUG_SYSLOG("check_virtualhost_name: ", vlimit_debug_log_buf, r->pool);
@@ -606,13 +610,13 @@ static int check_virtualhost_name(request_rec *r) {
     for (i = 0; i < r->server->names->nelts; i++) {
         alias_name = ((char **)r->server->names->elts)[i];
         vlimit_debug_log_buf = apr_psprintf(r->pool, "INFO: access_name=(%s) ServerAlias=(%s)"
-            , header_name
+            , access_host
             , alias_name
         );
         VLIMIT_DEBUG_SYSLOG("check_virtualhost_name: ", vlimit_debug_log_buf, r->pool);
-        if (strcmp(header_name, alias_name) == 0 ) {
+        if (strcmp(access_host, alias_name) == 0 ) {
             vlimit_debug_log_buf = apr_psprintf(r->pool, "Match: access_name=(%s) ServerAlias=(%s)"
-                , header_name
+                , access_host
                 , alias_name
             );
             VLIMIT_DEBUG_SYSLOG("check_virtualhost_name: ", vlimit_debug_log_buf, r->pool);
@@ -621,7 +625,7 @@ static int check_virtualhost_name(request_rec *r) {
     }
 
     vlimit_debug_log_buf = apr_psprintf(r->pool, "Not Match: access_name=(%s)"
-        , header_name
+        , access_host
     );
     VLIMIT_DEBUG_SYSLOG("check_virtualhost_name: ", vlimit_debug_log_buf, r->pool);
 
@@ -637,6 +641,7 @@ static int vlimit_check_limit(request_rec *r, vlimit_config *cfg)
 {
 
     const char *header_name;
+    const char *access_host;
 
     int ip_count     = 0;
     int file_count   = 0;
@@ -653,10 +658,13 @@ static int vlimit_check_limit(request_rec *r, vlimit_config *cfg)
     }
 
     header_name = apr_table_get(r->headers_in, "HOST");
+    access_host = strtok((char *)header_name, ":");
+    if (access_host == NULL)
+        access_host = (char *)header_name;
 
-    vlimit_debug_log_buf = apr_psprintf(r->pool, "client info: address=(%s) header_name=(%s)"
+    vlimit_debug_log_buf = apr_psprintf(r->pool, "client info: address=(%s) access_host=(%s)"
         , r->connection->remote_ip
-        , header_name
+        , access_host
     );
     VLIMIT_DEBUG_SYSLOG("vlimit_check_limit: ", vlimit_debug_log_buf, r->pool);
 
@@ -670,7 +678,7 @@ static int vlimit_check_limit(request_rec *r, vlimit_config *cfg)
         VLIMIT_DEBUG_SYSLOG("vlimit_check_limit: ", "make_file_slot_list exec. create list(" VLIMIT_FILE_STAT_FILE ").", r->pool);
 
     if (check_virtualhost_name(r)) {
-        VLIMIT_DEBUG_SYSLOG("vlimit_check_limit: ", "header_name != server_hostname. return OK.", r->pool);
+        VLIMIT_DEBUG_SYSLOG("vlimit_check_limit: ", "access_host != server_hostname. return OK.", r->pool);
         return OK;
     }
 
@@ -724,7 +732,7 @@ static int vlimit_check_limit(request_rec *r, vlimit_config *cfg)
         vlimit_debug_log_buf = apr_psprintf(r->pool
             , "Rejected, too many connections from this host(%s) to the file(%s) by VlimitIP[ip_limig=(%d) docroot=(%s)]."
             , r->connection->remote_ip
-            , header_name
+            , access_host
             , cfg->ip_limit
             , cfg->full_path
         );
@@ -738,7 +746,7 @@ static int vlimit_check_limit(request_rec *r, vlimit_config *cfg)
     } else if (cfg->file_limit > 0 && file_count > cfg->file_limit) {
         vlimit_debug_log_buf = apr_psprintf(r->pool
             , "Rejected, too many connections to the file(%s) by VlimitFile[limit=(%d) docroot=(%s)]."
-            , header_name
+            , access_host
             , cfg->file_limit
             , cfg->full_path
         );
