@@ -14,6 +14,7 @@ See also http://blog.matsumoto-r.jp/?p=1479
  2010/09/22 0.22 make_file_slot_list() create matsumoto_r
  2010/09/22 0.90 vlimit_mutex add matsumoto_r
  2010/12/24 1.00 ServerAlias routine add matsumoto_r
+ 2013/04/29 1.00 Support a port other than 80
 ```
 
 ## How To Compile
