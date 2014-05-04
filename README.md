@@ -1,4 +1,4 @@
-# mod_vlimit 
+# mod_vlimit [![Build Status](https://travis-ci.org/matsumoto-r/mod_vlimit.svg?branch=master)](https://travis-ci.org/matsumoto-r/mod_vlimit)
 Control the number of references from the same IP address to file access or the number of references from the same file name to file access By matsumoto_r (MATSUMOTO Ryosuke) Sep 2010 in Japan
 
 See also http://blog.matsumoto-r.jp/?p=1479
