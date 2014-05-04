@@ -157,6 +157,14 @@
 #define MAXSYMLINKS        256
 #endif
 
+#if (AP_SERVER_MINORVERSION_NUMBER > 2)                                          
+  #define __APACHE24__                                                           
+#endif                                                                           
+                                                                                 
+#ifdef __APACHE24__                                                              
+  #define remote_ip client_ip                                                    
+#endif                                                                           
+
 module AP_MODULE_DECLARE_DATA vlimit_module;
 
 typedef struct {
