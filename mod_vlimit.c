@@ -163,6 +163,7 @@
                                                                                  
 #ifdef __APACHE24__                                                              
   #define remote_ip client_ip                                                    
+  #define unixd_set_global_mutex_perms ap_unixd_set_global_mutex_perms
 #endif                                                                           
 
 module AP_MODULE_DECLARE_DATA vlimit_module;
