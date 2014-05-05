@@ -42,7 +42,7 @@ before_script:
 script:
   - echo ${APXS_CHECK_CMD}
   - ${APXS_CHECK_CMD}
-  - ../${HTTPD_VERSION}/apache/bin/apxs -i -c mod_vlimit.c
+  - make APXS=../${HTTPD_VERSION}/apache/bin/apxs
 notifications:
   irc:
     channels:
