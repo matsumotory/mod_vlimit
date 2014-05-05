@@ -1237,12 +1237,12 @@ static int vlimit_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp,
 static void vlimit_child_init(apr_pool_t *p, server_rec *server)           
 {                                                                                
   if(apr_global_mutex_child_init(&vlimit_mutex, NULL, p)) {
-    VLIMIT_DEBUG_SYSLOG("vlimit_init: ", "global mutex attached.", p);
+    VLIMIT_DEBUG_SYSLOG("vlimit_child_init: ", "global mutex attached.", p);
   }
   if (apr_shm_attach(&shm, NULL, p) == APR_SUCCESS) {
-    VLIMIT_DEBUG_SYSLOG("vlimit_init: ", "global shared memory attached.", p);
+    VLIMIT_DEBUG_SYSLOG("vlimit_child_init: ", "global shared memory attached.", p);
   } else {
-    VLIMIT_DEBUG_SYSLOG("vlimit_init: ", 
+    VLIMIT_DEBUG_SYSLOG("vlimit_child_init: ", 
         "global shared memory can't be attached.", p);
   }
 }                                                                                
