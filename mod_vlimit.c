@@ -159,8 +159,6 @@ typedef struct {
   int ip_limit;    /* max number of connections per IP */
   int file_limit;  /* max number of connections per IP */
   int conf_id;     /* directive id */
-  int file_match;  /* match files flag by VlimitFile */
-  int ip_match;    /* match files flag by VlimitFile */
   char *full_path; /* option target file realpath */
 
 } vlimit_config;
@@ -229,8 +227,6 @@ static vlimit_config *create_share_config(apr_pool_t *p)
   cfg->file_limit  = 0;
   cfg->full_path   = NULL;
   cfg->conf_id   = conf_counter++;
-  cfg->file_match  = 0;
-  cfg->ip_match  = 0;
 
   return cfg;
 }
@@ -361,8 +357,9 @@ void unset_file_counter(SHM_DATA *limit_stat, request_rec *r) {
 
   id = get_file_slot_id(limit_stat, r);
   
-  if (limit_stat->file_stat_shm[id].counter == 0)
+  if (limit_stat->file_stat_shm[id].counter == 0) {
     limit_stat->file_stat_shm[id].filename[0] = '\0';
+  }
 
 }
 
@@ -730,7 +727,6 @@ static int vlimit_check_limit(request_rec *r, vlimit_config *cfg)
       return HTTP_SERVICE_UNAVAILABLE;
     }
     file_count = get_file_counter(limit_stat, r);
-    cfg->file_match = 1;
   } else if (cfg->ip_limit > 0) {
     VLIMIT_DEBUG_SYSLOG("vlimit_check_limit: ", "type IP: ip_count++", r->pool);
     counter_stat = inc_ip_counter(limit_stat, r);
@@ -740,7 +736,6 @@ static int vlimit_check_limit(request_rec *r, vlimit_config *cfg)
       return HTTP_SERVICE_UNAVAILABLE;
     }
     ip_count = get_ip_counter(limit_stat, r);
-    cfg->ip_match = 1;
   }
 
   // vlimit_mutex unlock
@@ -1267,26 +1262,25 @@ static int vlimit_response_end(request_rec *r) {
     return OK;
   }
 
-  if (cfg->conf_id != 0 && cfg->file_match == 1) {
+  //if (cfg->conf_id != 0 && get_file_match(limit_stat, r) == 1) {
+  if (cfg->file_limit > 0) {
     VLIMIT_DEBUG_SYSLOG("vlimit_response_end: ", "type FILE: file_count--", 
         r->pool);
     if (get_file_counter(limit_stat, r) > 0)
       counter_stat = dec_file_counter(limit_stat, r);
     if (get_file_counter(limit_stat, r) == 0)
       unset_file_counter(limit_stat, r);
-    cfg->file_match = 0;
     if (counter_stat != -2)
       vlimit_logging("RESULT: END DEC", r, cfg, limit_stat);
-  }
+  } else if (cfg->ip_limit > 0) {
 
-  if (cfg->conf_id != 0 && cfg->ip_match == 1) {
+  //if (cfg->conf_id != 0 && cfg->ip_match == 1) {
     VLIMIT_DEBUG_SYSLOG("vlimit_response_end: ", "type IP: ip_count--", 
         r->pool);
     if (get_ip_counter(limit_stat, r) > 0)
       counter_stat = dec_ip_counter(limit_stat, r);
     if (get_ip_counter(limit_stat, r) == 0)
       unset_ip_counter(limit_stat, r);
-    cfg->ip_match = 0;
     if (counter_stat != -2)
       vlimit_logging("RESULT: END DEC", r, cfg, limit_stat);
   }
@@ -1320,10 +1314,10 @@ static int vlimit_response_end(request_rec *r) {
 /* ---------------------- */
 static void vlimit_register_hooks(apr_pool_t *p)
 {
-  static const char * const after_me[] = { "mod_cache.c", NULL };
+  //static const char * const after_me[] = { "mod_cache.c", NULL };
   ap_hook_post_config(vlimit_init, NULL, NULL, APR_HOOK_MIDDLE);
   ap_hook_child_init(vlimit_child_init, NULL, NULL, APR_HOOK_MIDDLE);
-  ap_hook_quick_handler(vlimit_quick_handler, NULL, after_me, APR_HOOK_FIRST);
+  //ap_hook_quick_handler(vlimit_quick_handler, NULL, after_me, APR_HOOK_FIRST);
   ap_hook_fixups(vlimit_handler, NULL, NULL, APR_HOOK_LAST);
   ap_hook_log_transaction(vlimit_response_end, NULL, NULL, APR_HOOK_MIDDLE);
 }
