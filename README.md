@@ -3,7 +3,7 @@ Control the number of references from the same IP address to file access or the 
 
 See also http://blog.matsumoto-r.jp/?p=1479
 
-- Date     2010/09/21 - 2013/04/29
+- Date     2010/09/21 - 
 - Version  1.00
 
 - change log
@@ -21,7 +21,12 @@ See also http://blog.matsumoto-r.jp/?p=1479
 ## How To Compile
 - Build
 ```bash
-apxs -i -c mod_vlimit.c
+make
+```
+
+- Install
+```bash
+make install
 ```
 
 - add to  httpd.conf
