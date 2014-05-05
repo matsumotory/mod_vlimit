@@ -606,24 +606,26 @@ static int check_virtualhost_name(request_rec *r) {
     return 0;
   }
 
-  for (i = 0; i < r->server->names->nelts; i++) {
-    alias_name = ((char **)r->server->names->elts)[i];
-    vlimit_debug_log_buf = apr_psprintf(r->pool
-      , "INFO: access_name=(%s) ServerAlias=(%s)"
-      , access_host
-      , alias_name
-    );
-    VLIMIT_DEBUG_SYSLOG("check_virtualhost_name: ", vlimit_debug_log_buf, 
-        r->pool);
-    if (strcmp(access_host, alias_name) == 0 ) {
+  if (r->server->names) {                                                   
+    for (i = 0; i < r->server->names->nelts; i++) {
+      alias_name = ((char **)r->server->names->elts)[i];
       vlimit_debug_log_buf = apr_psprintf(r->pool
-        , "Match: access_name=(%s) ServerAlias=(%s)"
+        , "INFO: access_name=(%s) ServerAlias=(%s)"
         , access_host
         , alias_name
       );
       VLIMIT_DEBUG_SYSLOG("check_virtualhost_name: ", vlimit_debug_log_buf, 
           r->pool);
-      return 0;
+      if (strcmp(access_host, alias_name) == 0 ) {
+        vlimit_debug_log_buf = apr_psprintf(r->pool
+          , "Match: access_name=(%s) ServerAlias=(%s)"
+          , access_host
+          , alias_name
+        );
+        VLIMIT_DEBUG_SYSLOG("check_virtualhost_name: ", vlimit_debug_log_buf, 
+            r->pool);
+        return 0;
+      }
     }
   }
 
