@@ -15,23 +15,24 @@ See also http://blog.matsumoto-r.jp/?p=1479
  2010/09/22 0.90 vlimit_mutex add matsumoto_r
  2010/12/24 1.00 ServerAlias routine add matsumoto_r
  2013/04/29 1.00 Support a port other than 80
+ 2013/04/28       ~ magaged by GitHub commit history
 ```
 
 ## How To Compile
 - Build
-```
+```bash
 apxs -i -c mod_vlimit.c
 ```
 
 - add to  httpd.conf
-```
+```apache
 LoadModule vlimit_module modules/mod_vlimit.so
 ```
 
 ## How To Use
 * VlimitIP `number of MaxConnectionsPerHost to DocumentRoot` `(RealPath of DocumentRoot)`
 
-    ```
+    ```apache
     <Directory "/www/hoge/huga/001">
          VlimitIP 5
     </Directory>
@@ -47,7 +48,7 @@ LoadModule vlimit_module modules/mod_vlimit.so
 
 - VlimitFile `number of MaxConnectionsPerFile` `(RealPath of DocumentRoot)`
 
-    ```
+    ```apache
     <Files "a.txt">
         VlimitFile 10 /www/hoge/huga/001/a.txt
     </Files>
@@ -59,42 +60,42 @@ LoadModule vlimit_module modules/mod_vlimit.so
 
 - Check Debug Log
 
-    ```
+    ```bash
     touch /tmp/VLIMIT_DEBUG
     less /var/log/syslog
     ```
 
 - Check Module Access Log
 
-    ```
+    ```bash
     touch /tmp/VLIMIT_LOG
     less /tmp/mod_vlimit.log
     ```
 
 - Check Current File Counter Lists
 
-    ```
+    ```bash
     touch /tmp/VLIMIT_FILE_STAT
     cat /tmp/vlimit_file_stat.list
     ```
      
 - recreate lists
 
-    ```
+    ```bash
     rm /tmp/vlimit_file_stat.list  
     cat /tmp/vlimit_file_stat.list
     ```
 
 - Check Current IP Counter Lists
 
-    ```
+    ```bash
     touch /tmp/VLIMIT_IP_STAT
     cat /tmp/vlimit_ip_stat.list
     ```
      
 - recreate lists
 
-    ```
+    ```bash
     rm /tmp/vlimit_ip_stat.list  
     cat /tmp/vlimit_ip_stat.list
     ```
