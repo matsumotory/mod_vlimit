@@ -1,0 +1,3 @@
+[submodule "ab-mruby"]
+	path = test/ab-mruby
+	url = git://github.com/matsumoto-r/ab-mruby.git
