@@ -304,6 +304,7 @@ static int get_file_counter(SHM_DATA *limit_stat, request_rec *r) {
 static int inc_file_counter(SHM_DATA *limit_stat, request_rec *r) {
 
   int id;
+  int old, new;
 
   id = get_file_slot_id(limit_stat, r);
 
@@ -314,7 +315,14 @@ static int inc_file_counter(SHM_DATA *limit_stat, request_rec *r) {
   }
 
   if (id >= 0) {
-    limit_stat->file_stat_shm[id].counter++;
+    while (1) {
+      old = limit_stat->file_stat_shm[id].counter;
+      new = old + 1;
+      if (limit_stat->file_stat_shm[id].counter == old) {
+        limit_stat->file_stat_shm[id].counter = new;
+        break;
+      }
+    }
     return 0;
   }
 
@@ -325,11 +333,19 @@ static int inc_file_counter(SHM_DATA *limit_stat, request_rec *r) {
 static int dec_file_counter(SHM_DATA *limit_stat, request_rec *r) {
 
   int id;
+  int old, new;
 
   id = get_file_slot_id(limit_stat, r);
 
   if (id >= 0) {
-    limit_stat->file_stat_shm[id].counter--;
+    while (1) {
+      old = limit_stat->file_stat_shm[id].counter;
+      new = old - 1;
+      if (limit_stat->file_stat_shm[id].counter == old) {
+        limit_stat->file_stat_shm[id].counter = new;
+        break;
+      }
+    }
     return 0;
   }
 
