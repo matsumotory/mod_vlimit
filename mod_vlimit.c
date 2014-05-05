@@ -216,9 +216,6 @@ static int VLIMIT_DEBUG_SYSLOG(const char *key, const char *msg, apr_pool_t *p)
   return -1;
 }
 
-
-
-
 /* ----------------------------------- */
 /* --- Create Share Config Routine --- */
 /* ----------------------------------- */
@@ -238,17 +235,16 @@ static vlimit_config *create_share_config(apr_pool_t *p)
   return cfg;
 }
 
-
 /* ------------------------------------ */
 /* --- Create Server Config Routine --- */
 /* ------------------------------------ */
 /* Create per-server configuration structure. Used by the quick handler. */
 static void *vlimit_create_server_config(apr_pool_t *p, server_rec *s)
 {
-  VLIMIT_DEBUG_SYSLOG("vlimit_create_server_config: ", "create server config.", p);
+  VLIMIT_DEBUG_SYSLOG("vlimit_create_server_config: ", "create server config.", 
+      p);
   return create_share_config(p);
 }
-
 
 /* --------------------------------- */
 /* --- Create Dir Config Routine --- */
@@ -259,9 +255,6 @@ static void *vlimit_create_dir_config(apr_pool_t *p, char *path)
   VLIMIT_DEBUG_SYSLOG("vlimit_create_dir_config: ", "create dir config.", p);
   return create_share_config(p);
 }
-
-
-
 
 /* -------------- */
 /* file stat data */
@@ -764,7 +757,6 @@ static int vlimit_check_limit(request_rec *r, vlimit_config *cfg)
   return OK;
 }
 
-
 /* ------------------------------------------------- */
 /* --- Analyze from the Path to RealPath Routine --- */
 /* ------------------------------------------------- */
@@ -863,7 +855,6 @@ realpath_for_vlimit(const char *path, char *resolved_path, int maxreslth, apr_po
 
 }
 
-
 /* ----------------------------------------- */
 /* --- Access Checker for Per Dir Config --- */
 /* ----------------------------------------- */
@@ -931,7 +922,6 @@ static int vlimit_handler(request_rec *r)
   return result;
 }
 
-
 /* -------------------------------------------- */
 /* --- Access Checker for Per Server Config --- */
 /* -------------------------------------------- */
@@ -986,7 +976,6 @@ static int vlimit_quick_handler(request_rec *r, int lookup)
   return result;
 }
 
-
 /* ------------------------------------ */
 /* --- Command_rec for VlimitIP--- */
 /* ------------------------------------ */
@@ -1020,7 +1009,6 @@ static const char *set_vlimitip(cmd_parms *parms, void *mconfig, const char *arg
 
   return NULL;
 }
-
 
 /* --------------------------------------- */
 /* --- Command_rec for VlimitFile--- */
@@ -1056,7 +1044,6 @@ static const char *set_vlimitfile(cmd_parms *parms, void *mconfig, const char *a
   return NULL;
 }
 
-
 /* ------------------------ */
 /* --- Command_rec Array--- */
 /* ------------------------ */
@@ -1065,7 +1052,6 @@ static command_rec vlimit_cmds[] = {
   AP_INIT_TAKE12("VlimitFile", set_vlimitfile, NULL, OR_LIMIT|RSRC_CONF, "maximum connections per File to DocumentRoot"),
   {NULL},
 };
-
 
 /* ------------------------------------------- */
 /* --- Init Routine or ap_hook_post_config --- */
@@ -1238,7 +1224,6 @@ static int vlimit_response_end(request_rec *r) {
   return OK;
 }
 
-
 /* ---------------------- */
 /* --- Register_hooks --- */
 /* ---------------------- */
@@ -1251,7 +1236,6 @@ static void vlimit_register_hooks(apr_pool_t *p)
   ap_hook_fixups(vlimit_handler, NULL, NULL, APR_HOOK_LAST);
   ap_hook_log_transaction(vlimit_response_end, NULL, NULL, APR_HOOK_MIDDLE);
 }
-
 
 /* ------------------------------ */
 /* --- Module Functions Array --- */
