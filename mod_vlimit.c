@@ -261,8 +261,9 @@ static int get_file_slot_id(SHM_DATA *limit_stat, request_rec *r) {
 
   for (i = 0; i < MAX_CLIENTS; i++) {
     if (strcmp(limit_stat->file_stat_shm[i].filename, basename(r->filename)) 
-        == 0)
+        == 0) {
       return i;
+    }
   }
 
   return -1;
@@ -273,8 +274,9 @@ static int get_file_empty_slot_id(SHM_DATA *limit_stat, request_rec *r) {
   int i;
 
   for (i = 0; i < MAX_CLIENTS; i++) {
-    if (limit_stat->file_stat_shm[i].filename[0] == '\0')
+    if (limit_stat->file_stat_shm[i].filename[0] == '\0') {
       return i;
+    }
   }
 
   // slot full
@@ -287,11 +289,13 @@ static int get_file_counter(SHM_DATA *limit_stat, request_rec *r) {
 
   id = get_file_slot_id(limit_stat, r);
 
-  if (id == -1) 
+  if (id == -1) {
     id = get_file_empty_slot_id(limit_stat, r);
+  }
   
-  if (id >= 0)
+  if (id >= 0) {
     return limit_stat->file_stat_shm[id].counter;
+  }
 
   // slot full
   return -1;
@@ -306,8 +310,9 @@ static int inc_file_counter(SHM_DATA *limit_stat, request_rec *r) {
 
   if (id == -1) {
     id = get_file_empty_slot_id(limit_stat, r);
-    if (id != -1)
+    if (id != -1) {
       strcpy(limit_stat->file_stat_shm[id].filename, basename(r->filename));
+    }
   }
 
   if (id >= 0) {
@@ -372,8 +377,9 @@ static int get_ip_slot_id(SHM_DATA *limit_stat, request_rec *r) {
 
   for (i = 0; i < MAX_CLIENTS; i++) {
     if (strcmp(limit_stat->ip_stat_shm[i].address, r->connection->remote_ip) 
-        == 0)
+        == 0) {
       return i;
+    }
   }
 
   return -1;
@@ -384,8 +390,9 @@ static int get_ip_empty_slot_id(SHM_DATA *limit_stat, request_rec *r) {
   int i;
 
   for (i = 0; i < MAX_CLIENTS; i++) {
-    if (limit_stat->ip_stat_shm[i].address[0] == '\0')
+    if (limit_stat->ip_stat_shm[i].address[0] == '\0') {
       return i;
+    }
   }
 
   // slot full
@@ -398,11 +405,13 @@ static int get_ip_counter(SHM_DATA *limit_stat, request_rec *r) {
 
   id = get_ip_slot_id(limit_stat, r);
 
-  if (id == -1) 
+  if (id == -1) {
     id = get_ip_empty_slot_id(limit_stat, r);
+  }
   
-  if (id >= 0)
+  if (id >= 0) {
     return limit_stat->ip_stat_shm[id].counter;
+  }
 
   // slot full
   return -1;
@@ -416,8 +425,9 @@ static int inc_ip_counter(SHM_DATA *limit_stat, request_rec *r) {
 
   if (id == -1) {
     id = get_ip_empty_slot_id(limit_stat, r);
-    if (id != -1)
+    if (id != -1) {
       strcpy(limit_stat->ip_stat_shm[id].address, r->connection->remote_ip);
+    }
   }
 
   if (id >= 0) {
@@ -452,8 +462,9 @@ void unset_ip_counter(SHM_DATA *limit_stat, request_rec *r) {
 
   id = get_ip_slot_id(limit_stat, r);
   
-  if (limit_stat->ip_stat_shm[id].counter == 0)
+  if (limit_stat->ip_stat_shm[id].counter == 0) {
     limit_stat->ip_stat_shm[id].address[0] = '\0';
+  }
 
 }
 
@@ -474,9 +485,9 @@ static int make_ip_slot_list(SHM_DATA *limit_stat, request_rec *r) {
 
     apr_file_t *vlimit_make_ip_slot_fp = NULL;
 
-    if(apr_file_open(&vlimit_make_ip_slot_fp, VLIMIT_IP_STAT_FILE, 
+    if (apr_file_open(&vlimit_make_ip_slot_fp, VLIMIT_IP_STAT_FILE, 
           APR_WRITE|APR_APPEND|APR_CREATE, APR_OS_DEFAULT, r->pool) 
-        != APR_SUCCESS){
+        != APR_SUCCESS) {
       return OK;
     }
 
@@ -496,7 +507,7 @@ static int make_ip_slot_list(SHM_DATA *limit_stat, request_rec *r) {
 
     apr_file_flush(vlimit_make_ip_slot_fp);
 
-    if(apr_file_close(vlimit_make_ip_slot_fp) != APR_SUCCESS){
+    if (apr_file_close(vlimit_make_ip_slot_fp) != APR_SUCCESS) {
       return OK;
     }
 
@@ -523,9 +534,9 @@ static int make_file_slot_list(SHM_DATA *limit_stat, request_rec *r) {
 
     apr_file_t *vlimit_make_file_slot_fp = NULL;
 
-    if(apr_file_open(&vlimit_make_file_slot_fp, VLIMIT_FILE_STAT_FILE, 
+    if (apr_file_open(&vlimit_make_file_slot_fp, VLIMIT_FILE_STAT_FILE, 
           APR_WRITE|APR_APPEND|APR_CREATE, APR_OS_DEFAULT, r->pool) 
-        != APR_SUCCESS){
+        != APR_SUCCESS) {
       return OK;
     }
 
@@ -545,7 +556,7 @@ static int make_file_slot_list(SHM_DATA *limit_stat, request_rec *r) {
 
     apr_file_flush(vlimit_make_file_slot_fp);
 
-    if(apr_file_close(vlimit_make_file_slot_fp) != APR_SUCCESS){
+    if (apr_file_close(vlimit_make_file_slot_fp) != APR_SUCCESS) {
       return OK;
     }
 
@@ -605,8 +616,9 @@ static int check_virtualhost_name(request_rec *r) {
 
   header_name = apr_table_get(r->headers_in, "HOST");
   access_host = strtok((char *)header_name, ":");
-  if (access_host == NULL)
+  if (access_host == NULL) {
     access_host = (char *)header_name;
+  }
 
   if (strcmp(access_host, r->server->server_hostname) == 0) {
     vlimit_debug_log_buf = apr_psprintf(r->pool
@@ -680,8 +692,9 @@ static int vlimit_check_limit(request_rec *r, vlimit_config *cfg)
 
   header_name = apr_table_get(r->headers_in, "HOST");
   access_host = strtok((char *)header_name, ":");
-  if (access_host == NULL)
+  if (access_host == NULL) {
     access_host = (char *)header_name;
+  }
 
   vlimit_debug_log_buf = apr_psprintf(r->pool
     , "client info: address=(%s) access_host=(%s)"
@@ -693,15 +706,17 @@ static int vlimit_check_limit(request_rec *r, vlimit_config *cfg)
   SHM_DATA *limit_stat;
   limit_stat = shm_base + cfg->conf_id;
   
-  if (make_ip_slot_list(limit_stat, r) != -1)
+  if (make_ip_slot_list(limit_stat, r) != -1) {
     VLIMIT_DEBUG_SYSLOG("vlimit_check_limit: ", 
         "make_ip_slot_list exec. create list(" VLIMIT_IP_STAT_FILE ").", 
         r->pool);
+  }
 
-  if (make_file_slot_list(limit_stat, r) != -1)
+  if (make_file_slot_list(limit_stat, r) != -1) {
     VLIMIT_DEBUG_SYSLOG("vlimit_check_limit: ", 
         "make_file_slot_list exec. create list(" VLIMIT_FILE_STAT_FILE ").", 
         r->pool);
+  }
 
   if (check_virtualhost_name(r)) {
     VLIMIT_DEBUG_SYSLOG("vlimit_check_limit: ", 
@@ -727,7 +742,8 @@ static int vlimit_check_limit(request_rec *r, vlimit_config *cfg)
       return HTTP_SERVICE_UNAVAILABLE;
     }
     file_count = get_file_counter(limit_stat, r);
-  } else if (cfg->ip_limit > 0) {
+  } 
+  else if (cfg->ip_limit > 0) {
     VLIMIT_DEBUG_SYSLOG("vlimit_check_limit: ", "type IP: ip_count++", r->pool);
     counter_stat = inc_ip_counter(limit_stat, r);
     if (counter_stat == -1) {
@@ -741,7 +757,7 @@ static int vlimit_check_limit(request_rec *r, vlimit_config *cfg)
   // vlimit_mutex unlock
   VLIMIT_DEBUG_SYSLOG("vlimit_check_limit: ", "vlimit_mutex unlocked.", 
       r->pool);
-  if (apr_global_mutex_unlock(vlimit_mutex) != APR_SUCCESS){
+  if (apr_global_mutex_unlock(vlimit_mutex) != APR_SUCCESS) {
     VLIMIT_DEBUG_SYSLOG("vlimit_check_limit: ", "vlimit_mutex unlock failed.", 
         r->pool);
     return OK;
@@ -770,12 +786,14 @@ static int vlimit_check_limit(request_rec *r, vlimit_config *cfg)
     );
     VLIMIT_DEBUG_SYSLOG("vlimit_check_limit: ", vlimit_debug_log_buf, r->pool);
 
-    if (counter_stat != -2)
+    if (counter_stat != -2) {
       vlimit_logging("RESULT: 503 INC", r, cfg, limit_stat);
+    }
 
     return HTTP_SERVICE_UNAVAILABLE;
 
-  } else if (cfg->file_limit > 0 && file_count > cfg->file_limit) {
+  } 
+  else if (cfg->file_limit > 0 && file_count > cfg->file_limit) {
     vlimit_debug_log_buf = apr_psprintf(r->pool
       , "Rejected, too many connections to the file(%s) by "
         "VlimitFile[limit=(%d) docroot=(%s)]."
@@ -785,18 +803,21 @@ static int vlimit_check_limit(request_rec *r, vlimit_config *cfg)
     );
     VLIMIT_DEBUG_SYSLOG("vlimit_check_limit: ", vlimit_debug_log_buf, r->pool);
 
-    if (counter_stat != -2)
+    if (counter_stat != -2) {
       vlimit_logging("RESULT: 503 INC", r, cfg, limit_stat);
+    }
 
     return HTTP_SERVICE_UNAVAILABLE;
     //return HTTP_NOT_FOUND;
 
-  } else {
+  } 
+  else {
     VLIMIT_DEBUG_SYSLOG("vlimit_check_limit: ", "OK: Passed all checks", 
         r->pool);
 
-    if (counter_stat != -2)
+    if (counter_stat != -2) {
       vlimit_logging("RESULT:  OK INC", r, cfg, limit_stat);
+    }
 
     return OK;
   }
@@ -821,12 +842,15 @@ static char * realpath_for_vlimit(const char *path, char *resolved_path,
   npath = resolved_path;
 
   if (*path != '/') {
-    if (!getcwd(npath, maxreslth-2))
+    if (!getcwd(npath, maxreslth-2)) {
       return NULL;
+    }
     npath += strlen(npath);
-    if (npath[-1] != '/')
+    if (npath[-1] != '/') {
       *npath++ = '/';
-  } else {
+    }
+  } 
+  else {
     *npath++ = '/';
     path++;
   }
@@ -873,16 +897,19 @@ static char * realpath_for_vlimit(const char *path, char *resolved_path,
       if (errno != EINVAL) {
         return NULL;
       }
-    } else {
+    } 
+    else {
       int m;
       char *newbuf;
 
       link_path[n] = '\0';
-      if (*link_path == '/')
+      if (*link_path == '/') {
         npath = resolved_path;
-      else
+      }
+      else {
         while (*(--npath) != '/')
           ;
+      }
 
       m = strlen(path);
       newbuf = apr_pcalloc(p, m + n + 1);
@@ -893,8 +920,9 @@ static char * realpath_for_vlimit(const char *path, char *resolved_path,
     *npath++ = '/';
   }
 
-  if (npath != resolved_path+1 && npath[-1] == '/')
+  if (npath != resolved_path+1 && npath[-1] == '/') {
     npath--;
+  }
 
   *npath = '\0';
 
@@ -927,7 +955,8 @@ static int vlimit_handler(request_rec *r)
   if (cfg->full_path != NULL) {
     if (access(r->filename, F_OK) != 0) {
       real_path_dir = apr_pstrdup(r->pool, r->filename);
-    } else if (realpath_for_vlimit(r->filename, real_path_dir, PATH_MAX, 
+    } 
+    else if (realpath_for_vlimit(r->filename, real_path_dir, PATH_MAX, 
           r->pool) == NULL) {
       vlimit_debug_log_buf = apr_psprintf(r->pool
         , "realpath_for_vlimit was failed. path=(%s)"
@@ -957,7 +986,8 @@ static int vlimit_handler(request_rec *r)
       , real_path_dir   
     );
     VLIMIT_DEBUG_SYSLOG("vlimit_handler: ", vlimit_debug_log_buf, r->pool);
-  } else {
+  } 
+  else {
     vlimit_debug_log_buf = apr_psprintf(r->pool
       , "full_path not found. cfg->full_path=(%s)"
       , cfg->full_path
@@ -990,7 +1020,8 @@ static int vlimit_quick_handler(request_rec *r, int lookup)
 
     if (access(r->filename, F_OK) != 0) {
       real_path_dir = apr_pstrdup(r->pool, r->filename);
-    } else if (realpath_for_vlimit(r->filename, real_path_dir, PATH_MAX, 
+    } 
+    else if (realpath_for_vlimit(r->filename, real_path_dir, PATH_MAX, 
           r->pool) == NULL) {
       vlimit_debug_log_buf = apr_psprintf(r->pool
         , "realpath_for_vlimit was failed. path=(%s)"
@@ -1049,8 +1080,7 @@ static const char *set_vlimitip(cmd_parms *parms, void *mconfig,
 
   /* No reasonable person would want more than 2^16. Better would be
      to use LONG_MAX but that causes portability problems on win32 */
-  if( (limit > 65535) || (limit < 0) )
-  {
+  if( (limit > 65535) || (limit < 0) ) {
     return "Integer overflow or invalid number";
   }
 
@@ -1059,7 +1089,8 @@ static const char *set_vlimitip(cmd_parms *parms, void *mconfig,
     cfg->type    = SET_VLIMITIP;
     cfg->ip_limit  = limit;
     cfg->full_path = apr_pstrdup(parms->pool, arg_opt1);
-  } else {
+  } 
+  else {
     /* Per-server context */
     scfg->type    = SET_VLIMITIP;
     scfg->ip_limit  = limit;
@@ -1084,8 +1115,7 @@ static const char *set_vlimitfile(cmd_parms *parms, void *mconfig,
 
   /* No reasonable person would want more than 2^16. Better would be
      to use LONG_MAX but that causes portability problems on win32 */
-  if( (limit > 65535) || (limit < 0) )
-  {
+  if( (limit > 65535) || (limit < 0) ) {
     return "Integer overflow or invalid number";
   }
 
@@ -1094,7 +1124,8 @@ static const char *set_vlimitfile(cmd_parms *parms, void *mconfig,
     cfg->type    = SET_VLIMITFILE;
     cfg->file_limit = limit;
     cfg->full_path   = apr_pstrdup(parms->pool, arg_opt1);
-  } else {
+  } 
+  else {
     /* Per-server context */
     scfg->type    = SET_VLIMITFILE;
     scfg->file_limit = limit;
@@ -1142,13 +1173,13 @@ static int vlimit_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp,
 
   //Create global mutex
   status = apr_global_mutex_create(&vlimit_mutex, NULL, APR_LOCK_DEFAULT, p);
-  if(status != APR_SUCCESS){
+  if (status != APR_SUCCESS) {
     VLIMIT_DEBUG_SYSLOG("vlimit_init: ", "Error creating global mutex.", p);
     return status;
   }
 #ifdef AP_NEED_SET_MUTEX_PERMS
   status = unixd_set_global_mutex_perms(vlimit_mutex);
-  if(status != APR_SUCCESS){
+  if (status != APR_SUCCESS) {
     VLIMIT_DEBUG_SYSLOG("vlimit_init: ", 
         "Error xrent could not set permissions on global mutex.", p);
     return status;
@@ -1162,7 +1193,8 @@ static int vlimit_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp,
       VLIMIT_DEBUG_SYSLOG("vlimit_init: ", 
           "Couldn't destroy old memory block", p);
       return status;
-    } else {
+    } 
+    else {
       VLIMIT_DEBUG_SYSLOG("vlimit_init: ", 
           "Old Shared memory block, destroyed.", p);
     }
@@ -1236,7 +1268,8 @@ static void vlimit_child_init(apr_pool_t *p, server_rec *server)
   }
   if (apr_shm_attach(&shm, NULL, p) == APR_SUCCESS) {
     VLIMIT_DEBUG_SYSLOG("vlimit_child_init: ", "global shared memory attached.", p);
-  } else {
+  } 
+  else {
     VLIMIT_DEBUG_SYSLOG("vlimit_child_init: ", 
         "global shared memory can't be attached.", p);
   }
@@ -1262,27 +1295,32 @@ static int vlimit_response_end(request_rec *r) {
     return OK;
   }
 
-  //if (cfg->conf_id != 0 && get_file_match(limit_stat, r) == 1) {
   if (cfg->file_limit > 0) {
     VLIMIT_DEBUG_SYSLOG("vlimit_response_end: ", "type FILE: file_count--", 
         r->pool);
-    if (get_file_counter(limit_stat, r) > 0)
+    if (get_file_counter(limit_stat, r) > 0) {
       counter_stat = dec_file_counter(limit_stat, r);
-    if (get_file_counter(limit_stat, r) == 0)
+    }
+    if (get_file_counter(limit_stat, r) == 0) {
       unset_file_counter(limit_stat, r);
-    if (counter_stat != -2)
+    }
+    if (counter_stat != -2) {
       vlimit_logging("RESULT: END DEC", r, cfg, limit_stat);
-  } else if (cfg->ip_limit > 0) {
+    }
+  } 
+  else if (cfg->ip_limit > 0) {
 
-  //if (cfg->conf_id != 0 && cfg->ip_match == 1) {
     VLIMIT_DEBUG_SYSLOG("vlimit_response_end: ", "type IP: ip_count--", 
         r->pool);
-    if (get_ip_counter(limit_stat, r) > 0)
+    if (get_ip_counter(limit_stat, r) > 0) {
       counter_stat = dec_ip_counter(limit_stat, r);
-    if (get_ip_counter(limit_stat, r) == 0)
+    }
+    if (get_ip_counter(limit_stat, r) == 0) {
       unset_ip_counter(limit_stat, r);
-    if (counter_stat != -2)
+    }
+    if (counter_stat != -2) {
       vlimit_logging("RESULT: END DEC", r, cfg, limit_stat);
+    }
   }
 
   // vlimit_mutex unlock
