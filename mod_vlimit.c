@@ -17,90 +17,6 @@
 //  2010/09/22 0.90 vlimit_mutex add matsumoto_r
 //  2010/12/24 1.00 ServerAlias routine add matsumoto_r
 // -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-// How To Compile
-// [Use DSO]
-// apxs -i -c mod_vlimit.c
-//
-// <add to  httpd.conf>
-// LoadModule vlimit_module modules/mod_vlimit.so
-//
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-// How To Use
-//
-// VlimitIP <number of MaxConnectionsPerHost to DocumentRoot> (RealPath of 
-// DocumentRoot)
-//
-//    <Directory "/www/hoge/huga/001">
-//       VlimitIP 5
-//    </Directory>
-//
-//
-//    <Files "a.txt">
-//      VlimitIP 10 /www/hoge/huga/001/a.txt
-//    </Files>
-//
-//    <FilesMatch "^.*\.txt$">
-//      VlimitIP 10
-//    </Files>
-//
-//
-// VlimitFile <number of MaxConnectionsPerFile> (RealPath of DocumentRoot)
-//
-//    <Files "a.txt">
-//      VlimitFile 10 /www/hoge/huga/001/a.txt
-//    </Files>
-//
-//    <FilesMatch "^.*\.txt$">
-//      VlimitFile 10
-//    </Files>
-//
-// Check Debug Log
-//    touch /tmp/VLIMIT_DEBUG
-//    less /var/log/syslog
-//
-// Check Module Access Log
-//    touch /tmp/VLIMIT_LOG
-//    less /tmp/mod_vlimit.log
-//
-// Check Current File Counter Lists
-//    touch /tmp/VLIMIT_FILE_STAT
-//    cat /tmp/vlimit_file_stat.list
-//    
-//    - recreate lists
-//      rm /tmp/vlimit_file_stat.list  
-//      cat /tmp/vlimit_file_stat.list
-//
-// Check Current IP Counter Lists
-//    touch /tmp/VLIMIT_IP_STAT
-//    cat /tmp/vlimit_ip_stat.list
-//    
-//    - recreate lists
-//      rm /tmp/vlimit_ip_stat.list  
-//      cat /tmp/vlimit_ip_stat.list
-// 
-// vlimit_file_stat.list sample
-// [Fri Mar 11 11:51:15 2011] slot=[2] filename=[20.php] counter=[10]
-// [Fri Mar 11 11:51:15 2011] slot=[3] filename=[12.php] counter=[7]
-// [Fri Mar 11 11:51:15 2011] slot=[4] filename=[23.php] counter=[10]
-// [Fri Mar 11 11:51:15 2011] slot=[5] filename=[24.php] counter=[10]
-// [Fri Mar 11 11:51:15 2011] slot=[6] filename=[4.php] counter=[2]
-// [Fri Mar 11 11:51:15 2011] slot=[7] filename=[25.php] counter=[10]
-// [Fri Mar 11 11:51:15 2011] slot=[8] filename=[2.php] counter=[7]
-// [Fri Mar 11 11:51:15 2011] slot=[9] filename=[1.php] counter=[5]
-// [Fri Mar 11 11:51:15 2011] slot=[10] filename=[3.php] counter=[2]
-// [Fri Mar 11 11:51:15 2011] slot=[11] filename=[5.php] counter=[2]
-//
-// vlimit_ip_stat.list sample
-// [Fri Mar 11 11:54:29 2011] slot=[0] ipaddress=[172.16.71.46] counter=[6]
-// [Fri Mar 11 11:54:29 2011] slot=[0] ipaddress=[172.16.71.47] counter=[5]
-// [Fri Mar 11 11:54:29 2011] slot=[0] ipaddress=[172.16.71.48] counter=[7]
-// [Fri Mar 11 11:54:29 2011] slot=[0] ipaddress=[172.16.71.40] counter=[3]
-// [Fri Mar 11 11:54:29 2011] slot=[0] ipaddress=[172.16.71.49] counter=[1]
-// -------------------------------------------------------------------
 */
 
 #include "httpd.h"
@@ -154,41 +70,33 @@
 module AP_MODULE_DECLARE_DATA vlimit_module;
 
 typedef struct {
-
   int type;        /* max number of connections per IP */
   int ip_limit;    /* max number of connections per IP */
   int file_limit;  /* max number of connections per IP */
   int conf_id;     /* directive id */
   char *full_path; /* option target file realpath */
-
 } vlimit_config;
 
 typedef struct ip_data {
-
   char address[IP_MAX];
   int counter;
-
 } ip_stat;
 
 typedef struct file_data {
-
   char filename[MAX_FILENAME];
   int counter;
-
 } file_stat;
 
 typedef struct shm_data_str {
-
   file_stat file_stat_shm[MAX_CLIENTS];
   ip_stat ip_stat_shm[MAX_CLIENTS];
-
 } SHM_DATA;
 
 // shared memory
 apr_shm_t *shm;
-SHM_DATA *shm_base      = NULL;
-apr_file_t *vlimit_log_fp   = NULL;
-static int conf_counter   = 0;
+SHM_DATA *shm_base = NULL;
+apr_file_t *vlimit_log_fp = NULL;
+static int conf_counter = 0;
 
 // grobal mutex 
 apr_global_mutex_t *vlimit_mutex;
@@ -1267,7 +1175,8 @@ static void vlimit_child_init(apr_pool_t *p, server_rec *server)
     VLIMIT_DEBUG_SYSLOG("vlimit_child_init: ", "global mutex attached.", p);
   }
   if (apr_shm_attach(&shm, NULL, p) == APR_SUCCESS) {
-    VLIMIT_DEBUG_SYSLOG("vlimit_child_init: ", "global shared memory attached.", p);
+    VLIMIT_DEBUG_SYSLOG("vlimit_child_init: ", 
+        "global shared memory attached.", p);
   } 
   else {
     VLIMIT_DEBUG_SYSLOG("vlimit_child_init: ", 
