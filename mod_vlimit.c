@@ -1313,7 +1313,7 @@ static void vlimit_register_hooks(apr_pool_t *p)
   static const char * const after_me[] = { "mod_cache.c", NULL };
   ap_hook_post_config(vlimit_init, NULL, NULL, APR_HOOK_MIDDLE);
   ap_hook_quick_handler(vlimit_quick_handler, NULL, after_me, APR_HOOK_FIRST);
-  ap_hook_access_checker(vlimit_handler, NULL, NULL, APR_HOOK_LAST);
+  ap_hook_fixups(vlimit_handler, NULL, NULL, APR_HOOK_LAST);
   ap_hook_log_transaction(vlimit_response_end, NULL, NULL, APR_HOOK_MIDDLE);
 }
 
