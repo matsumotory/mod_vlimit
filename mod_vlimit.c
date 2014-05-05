@@ -1284,6 +1284,13 @@ static int vlimit_response_end(request_rec *r) {
   vlimit_config *cfg =
     (vlimit_config *) ap_get_module_config(r->per_dir_config, &vlimit_module);
 
+  if (check_virtualhost_name(r)) {
+    VLIMIT_DEBUG_SYSLOG(__func__, 
+        ": access_host != server_hostname. return OK.", r->pool);
+    VLIMIT_DEBUG_SYSLOG("vlimit_response_end: ", "end", r->pool);
+    return OK;
+  }
+
   SHM_DATA *limit_stat;
   limit_stat = shm_base + cfg->conf_id;
 
