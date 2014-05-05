@@ -75,7 +75,7 @@ end
 
 test_suite do
   "FailedRequests".should_be                   1
-  "CompleteRequests".should_be                 1
+  "CompleteRequests".should_be                 2
   "Non2xxResponses".should_be                  1
 end
 
