@@ -3,3 +3,7 @@ mod_vlimit.lo
 mod_vlimit.o
 mod_vlimit.slo
 .libs
+GPATH                                                            
+GRTAGS                                                           
+GTAGS                                                            
+
