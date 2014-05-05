@@ -1160,9 +1160,6 @@ static int vlimit_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp,
   }
 #endif
 
-  if(apr_global_mutex_child_init(&vlimit_mutex, NULL, p))
-    VLIMIT_DEBUG_SYSLOG("vlimit_init: ", "global mutex attached.", p);
-
   /* If there was a memory block already assigned.. destroy it */
   if (shm) {
     status = apr_shm_destroy(shm);
@@ -1236,6 +1233,13 @@ static int vlimit_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp,
 
   return OK;
 }
+
+static void vlimit_child_init(apr_pool_t *p, server_rec *server)           
+{                                                                                
+  if(apr_global_mutex_child_init(&vlimit_mutex, NULL, p)) {
+    VLIMIT_DEBUG_SYSLOG("vlimit_init: ", "global mutex attached.", p);
+  }
+}                                                                                
 
 static int vlimit_response_end(request_rec *r) {
 
@@ -1312,6 +1316,7 @@ static void vlimit_register_hooks(apr_pool_t *p)
 {
   static const char * const after_me[] = { "mod_cache.c", NULL };
   ap_hook_post_config(vlimit_init, NULL, NULL, APR_HOOK_MIDDLE);
+  ap_hook_child_init(vlimit_child_init, NULL, NULL, APR_HOOK_MIDDLE);
   ap_hook_quick_handler(vlimit_quick_handler, NULL, after_me, APR_HOOK_FIRST);
   ap_hook_fixups(vlimit_handler, NULL, NULL, APR_HOOK_LAST);
   ap_hook_log_transaction(vlimit_response_end, NULL, NULL, APR_HOOK_MIDDLE);
