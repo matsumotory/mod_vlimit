@@ -35,6 +35,9 @@ clean:
 #   reload the module by installing and restarting Apache
 reload: install restart
 
+test:
+	git submodule init && git submodule update && cd test/ab-mruby && make
+
 #   the general Apache start/restart/stop procedures
 start:
 	$(APACHECTL) start
@@ -43,3 +46,4 @@ restart:
 stop:
 	$(APACHECTL) stop
 
+.PHONY: test
