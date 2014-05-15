@@ -1273,7 +1273,7 @@ static void vlimit_register_hooks(apr_pool_t *p)
   ap_hook_child_init(vlimit_child_init, NULL, NULL, APR_HOOK_MIDDLE);
   //ap_hook_quick_handler(vlimit_quick_handler, NULL, after_me, APR_HOOK_FIRST);
   ap_hook_fixups(vlimit_handler, NULL, NULL, APR_HOOK_LAST);
-  ap_hook_log_transaction(vlimit_response_end, NULL, NULL, APR_HOOK_MIDDLE);
+  ap_hook_log_transaction(vlimit_response_end, NULL, NULL, APR_HOOK_FIRST);
 }
 
 /* ------------------------------ */
