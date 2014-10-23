@@ -651,7 +651,7 @@ static int vlimit_check_limit(request_rec *r, vlimit_config *cfg)
     }
     file_count = get_file_counter(limit_stat, r);
   } 
-  else if (cfg->ip_limit > 0) {
+  if (cfg->ip_limit > 0) {
     VLIMIT_DEBUG_SYSLOG("vlimit_check_limit: ", "type IP: ip_count++", r->pool);
     counter_stat = inc_ip_counter(limit_stat, r);
     if (counter_stat == -1) {
@@ -701,7 +701,7 @@ static int vlimit_check_limit(request_rec *r, vlimit_config *cfg)
     return HTTP_SERVICE_UNAVAILABLE;
 
   } 
-  else if (cfg->file_limit > 0 && file_count > cfg->file_limit) {
+  if (cfg->file_limit > 0 && file_count > cfg->file_limit) {
     vlimit_debug_log_buf = apr_psprintf(r->pool
       , "Rejected, too many connections to the file(%s) by "
         "VlimitFile[limit=(%d) docroot=(%s)]."
@@ -719,15 +719,13 @@ static int vlimit_check_limit(request_rec *r, vlimit_config *cfg)
     //return HTTP_NOT_FOUND;
 
   } 
-  else {
-    VLIMIT_DEBUG_SYSLOG("vlimit_check_limit: ", "OK: Passed all checks", 
-        r->pool);
 
-    if (counter_stat != -2) {
-      vlimit_logging("RESULT:  OK INC", r, cfg, limit_stat);
-    }
+  // all check passed, return response normally
+  VLIMIT_DEBUG_SYSLOG("vlimit_check_limit: ", "OK: Passed all checks", 
+      r->pool);
 
-    return OK;
+  if (counter_stat != -2) {
+    vlimit_logging("RESULT:  OK INC", r, cfg, limit_stat);
   }
 
   return OK;
@@ -1220,11 +1218,8 @@ static int vlimit_response_end(request_rec *r) {
     if (get_file_counter(limit_stat, r) == 0) {
       unset_file_counter(limit_stat, r);
     }
-    if (counter_stat != -2) {
-      vlimit_logging("RESULT: END DEC", r, cfg, limit_stat);
-    }
   } 
-  else if (cfg->ip_limit > 0) {
+  if (cfg->ip_limit > 0) {
 
     VLIMIT_DEBUG_SYSLOG("vlimit_response_end: ", "type IP: ip_count--", 
         r->pool);
@@ -1234,9 +1229,11 @@ static int vlimit_response_end(request_rec *r) {
     if (get_ip_counter(limit_stat, r) == 0) {
       unset_ip_counter(limit_stat, r);
     }
-    if (counter_stat != -2) {
-      vlimit_logging("RESULT: END DEC", r, cfg, limit_stat);
-    }
+  }
+
+  // when decrement counter, write log
+  if (counter_stat != -2) {
+    vlimit_logging("RESULT: END DEC", r, cfg, limit_stat);
   }
 
   // vlimit_mutex unlock
