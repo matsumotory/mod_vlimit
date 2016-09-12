@@ -38,7 +38,7 @@ LoadModule vlimit_module modules/mod_vlimit.so
 * VlimitIP `number of MaxConnectionsPerHost to DocumentRoot` `(RealPath of DocumentRoot)`
 
     ```apache
-    <Directory "/www/hoge/huga/001">
+    <Directory "/path/to/host/">
          VlimitIP 5
     </Directory>
     
