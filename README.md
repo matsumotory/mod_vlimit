@@ -43,7 +43,7 @@ LoadModule vlimit_module modules/mod_vlimit.so
     </Directory>
     
     <Files "a.txt">
-        VlimitIP 10 /www/hoge/huga/001/a.txt
+        VlimitIP 10 /path/to/a.txt
     </Files>
     
     <FilesMatch "^.*\.txt$">
@@ -55,7 +55,7 @@ LoadModule vlimit_module modules/mod_vlimit.so
 
     ```apache
     <Files "a.txt">
-        VlimitFile 10 /www/hoge/huga/001/a.txt
+        VlimitFile 10 /path/to/a.txt
     </Files>
     
     <FilesMatch "^.*\.txt$">
